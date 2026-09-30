@@ -36,6 +36,71 @@ const [error, setError] = useState("");
     setDragActive(false);
     handleFile(event.dataTransfer.files?.[0]);
   };
+    const analyzeSkin = async () => {
+    if (!selectedFile) return;
+
+    setAnalyzing(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/analyze-skin`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Skin analysis failed.");
+      }
+
+      const taskId = data.task?.data?.task_id;
+
+      if (!taskId) {
+        throw new Error("Task ID was not returned by the backend.");
+      }
+
+      let finalResult = null;
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const resultResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/skin-result/${taskId}`
+        );
+
+        const resultData = await resultResponse.json();
+
+        if (!resultResponse.ok) {
+          throw new Error(
+            resultData.detail || "Could not fetch skin result."
+          );
+        }
+
+        if (resultData.data?.task_status === "success") {
+          finalResult = resultData;
+          break;
+        }
+      }
+
+      if (!finalResult) {
+        throw new Error("Analysis is taking too long. Please try again.");
+      }
+
+      setResult(finalResult);
+    } catch (err) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   return (
     <div className="app-shell">
