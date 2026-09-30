@@ -239,6 +239,30 @@ const [error, setError] = useState("");
               <ShieldCheck size={14} />
               Your photo is processed securely.
             </p>
+            {analyzing && (
+  <p
+    style={{
+      marginTop: "14px",
+      textAlign: "center",
+      fontWeight: "600",
+    }}
+  >
+    🔍 Analyzing your skin...
+  </p>
+)}
+
+{error && (
+  <p
+    style={{
+      marginTop: "14px",
+      textAlign: "center",
+      color: "#b42318",
+      fontWeight: "600",
+    }}
+  >
+    {error}
+  </p>
+)}
           </div>
         </section>
 
