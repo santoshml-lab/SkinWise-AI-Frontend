@@ -84,7 +84,12 @@ const [error, setError] = useState("");
           );
         }
 
-        if (resultData.data?.task_status === "success") {
+        if (
+  resultData?.data?.task_status === "success" ||
+  resultData?.data?.status === "success" ||
+  resultData?.task_status === "success" ||
+  resultData?.status === "success"
+) {
           finalResult = resultData;
           break;
         }
