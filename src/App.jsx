@@ -12,6 +12,9 @@ import {
 function App() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+const [result, setResult] = useState(null);
+const [error, setError] = useState("");
 
   const handleFile = (file) => {
     if (!file) return;
