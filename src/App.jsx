@@ -219,13 +219,21 @@ const [error, setError] = useState("");
             </label>
 
             <button
-              className="analyze-button"
-              disabled={!selectedFile}
-            >
-              <Sparkles size={18} />
-              Analyze My Skin
-              <ChevronRight size={18} />
-            </button>
+  className="analyze-button"
+  onClick={analyzeSkin}
+  disabled={!selectedFile || analyzing}
+>
+  <Sparkles size={18} />
+
+  {analyzing ? "Analyzing..." : "Analyze My Skin"}
+
+  <ChevronRight size={18} />
+</button>
+              
+              
+            
+              
+              
 
             <p className="privacy-note">
               <ShieldCheck size={14} />
