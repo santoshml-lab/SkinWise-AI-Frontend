@@ -10,6 +10,10 @@ import {
   RotateCcw,
 } from "lucide-react";
 
+/* =========================
+   SKINWISE PRODUCT CATALOG
+========================= */
+
 const productCatalog = {
   "Gentle cleansers": [
     {
@@ -56,6 +60,21 @@ const productCatalog = {
     },
   ],
 
+  "Niacinamide-based cosmetic serums": [
+    {
+      name: "Niacinamide-Based Cosmetic Serum",
+      description:
+        "A cosmetic serum category featuring niacinamide for a simple skincare routine.",
+      category: "Niacinamide-based cosmetic serums",
+    },
+    {
+      name: "Daily Niacinamide Cosmetic Serum",
+      description:
+        "A cosmetic serum category designed to fit into a balanced skincare routine.",
+      category: "Niacinamide-based cosmetic serums",
+    },
+  ],
+
   "Lightweight moisturizers": [
     {
       name: "Lightweight Daily Moisturizer",
@@ -85,17 +104,45 @@ const productCatalog = {
       category: "Broad-spectrum SPF 30+ sunscreens",
     },
   ],
+
+  "Gentle cosmetic exfoliants": [
+    {
+      name: "Gentle Cosmetic Exfoliant",
+      description:
+        "A gentle cosmetic exfoliant category for a simple skincare routine.",
+      category: "Gentle cosmetic exfoliants",
+    },
+    {
+      name: "Mild Daily-Use Cosmetic Exfoliant",
+      description:
+        "A cosmetic exfoliant category intended for gentle routine support.",
+      category: "Gentle cosmetic exfoliants",
+    },
+  ],
 };
 
+
 function App() {
+  /* =========================
+     STATE
+  ========================= */
+
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+
   const [selectedCategory, setSelectedCategory] = useState(null);
+
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+
   const [insights, setInsights] = useState(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
+
+
+  /* =========================
+     FILE HANDLING
+  ========================= */
 
   const handleFile = (file) => {
     if (!file) return;
@@ -107,18 +154,28 @@ function App() {
 
     setSelectedFile(file);
     setResult(null);
+    setInsights(null);
+    setSelectedCategory(null);
     setError("");
   };
+
 
   const handleInputChange = (event) => {
     handleFile(event.target.files?.[0]);
   };
 
+
   const handleDrop = (event) => {
     event.preventDefault();
     setDragActive(false);
+
     handleFile(event.dataTransfer.files?.[0]);
   };
+
+
+  /* =========================
+     SKIN ANALYSIS
+  ========================= */
 
   const analyzeSkin = async () => {
     if (!selectedFile) return;
@@ -126,10 +183,18 @@ function App() {
     setAnalyzing(true);
     setError("");
     setResult(null);
+    setInsights(null);
+    setSelectedCategory(null);
 
     try {
       const formData = new FormData();
+
       formData.append("file", selectedFile);
+
+
+      /* -------------------------
+         CREATE YOUCAM TASK
+      ------------------------- */
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/analyze-skin`,
@@ -139,43 +204,71 @@ function App() {
         }
       );
 
+
       const data = await response.json();
 
+
       if (!response.ok) {
-        throw new Error(data.detail || "Skin analysis failed.");
+        throw new Error(
+          data.detail || "Skin analysis failed."
+        );
       }
+
 
       const taskId = data.task?.data?.task_id;
 
+
       if (!taskId) {
-        throw new Error("Task ID was not returned by the backend.");
+        throw new Error(
+          "Task ID was not returned by the backend."
+        );
       }
+
+
+      /* -------------------------
+         POLL YOUCAM RESULT
+      ------------------------- */
 
       let finalResult = null;
 
+
       for (let i = 0; i < 18; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 10000)
+        );
+
 
         const resultResponse = await fetch(
           `${import.meta.env.VITE_API_URL}/skin-result/${taskId}`
         );
 
+
         const resultData = await resultResponse.json();
+
 
         if (!resultResponse.ok) {
           throw new Error(
-            resultData.detail || "Could not fetch skin result."
+            resultData.detail ||
+              "Could not fetch skin result."
           );
         }
 
-        const taskStatus = resultData?.data?.task_status;
 
-        console.log("YouCam task status:", taskStatus);
+        const taskStatus =
+          resultData?.data?.task_status;
+
+
+        console.log(
+          "YouCam task status:",
+          taskStatus
+        );
+
 
         if (taskStatus === "success") {
           finalResult = resultData;
           break;
         }
+
 
         if (taskStatus === "error") {
           throw new Error(
@@ -186,76 +279,115 @@ function App() {
         }
       }
 
+
       if (!finalResult) {
-        throw new Error("Analysis is taking too long. Please try again.");
+        throw new Error(
+          "Analysis is taking too long. Please try again."
+        );
       }
+
 
       setResult(finalResult);
 
-const output = finalResult?.data?.results?.output || [];
 
-const scores = output
-  .filter((item) =>
-    [
-      "all",
-      "acne",
-      "moisture",
-      "oiliness",
-      "pore",
-      "texture",
-      "redness",
-      "wrinkle",
-      "age_spot",
-      "radiance",
-      "firmness",
-    ].includes(item.type)
-  )
-  .map((item) => ({
-    type: item.type,
-    ...(item.score !== undefined
-      ? { score: item.score }
-      : { ui_score: item.ui_score }),
-  }));
+      /* =========================
+         PREPARE AI INSIGHT DATA
+      ========================= */
 
-setInsightsLoading(true);
+      const output =
+        finalResult?.data?.results?.output || [];
 
-try {
-  const insightResponse = await fetch(
-    `${import.meta.env.VITE_API_URL}/personalized-insights`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        scores,
-      }),
-    }
-  );
 
-  const insightData = await insightResponse.json();
+      const scores = output
+        .filter((item) =>
+          [
+            "all",
+            "acne",
+            "moisture",
+            "oiliness",
+            "pore",
+            "texture",
+            "redness",
+            "wrinkle",
+            "age_spot",
+            "radiance",
+            "firmness",
+          ].includes(item.type)
+        )
+        .map((item) => ({
+          type: item.type,
 
-  if (!insightResponse.ok) {
-    throw new Error(
-      insightData.detail || "Could not generate AI insights."
-    );
-  }
+          ...(item.score !== undefined
+            ? { score: item.score }
+            : { ui_score: item.ui_score }),
+        }));
 
-  setInsights(insightData.insights);
-} catch (insightError) {
-  console.error("AI insights error:", insightError);
-  setError(
-    insightError.message || "Could not generate personalized insights."
-  );
-} finally {
-  setInsightsLoading(false);
-}
+
+      /* =========================
+         GENERATE AI INSIGHTS
+      ========================= */
+
+      setInsightsLoading(true);
+
+
+      try {
+        const insightResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/personalized-insights`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+              scores,
+            }),
+          }
+        );
+
+
+        const insightData =
+          await insightResponse.json();
+
+
+        if (!insightResponse.ok) {
+          throw new Error(
+            insightData.detail ||
+              "Could not generate AI insights."
+          );
+        }
+
+
+        setInsights(insightData.insights);
+      } catch (insightError) {
+        console.error(
+          "AI insights error:",
+          insightError
+        );
+
+
+        setError(
+          insightError.message ||
+            "Could not generate personalized insights."
+        );
+      } finally {
+        setInsightsLoading(false);
+      }
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+      setError(
+        err.message ||
+          "Something went wrong."
+      );
     } finally {
       setAnalyzing(false);
     }
   };
+
+
+  /* =========================
+     GET METRIC
+  ========================= */
 
   const getMetric = (type) => {
     return (
@@ -265,131 +397,260 @@ try {
     );
   };
 
+
   const overallScore = getMetric("all");
   const skinAge = getMetric("skin_age");
 
+
+  /* =========================
+     METRICS
+  ========================= */
+
   const metrics = [
-    { type: "acne", label: "Acne" },
-    { type: "moisture", label: "Moisture" },
-    { type: "oiliness", label: "Oiliness" },
-    { type: "pore", label: "Pores" },
-    { type: "texture", label: "Texture" },
-    { type: "redness", label: "Redness" },
-    { type: "wrinkle", label: "Wrinkles" },
-    { type: "age_spot", label: "Age Spots" },
-    { type: "radiance", label: "Radiance" },
-    { type: "firmness", label: "Firmness" },
+    {
+      type: "acne",
+      label: "Acne",
+    },
+    {
+      type: "moisture",
+      label: "Moisture",
+    },
+    {
+      type: "oiliness",
+      label: "Oiliness",
+    },
+    {
+      type: "pore",
+      label: "Pores",
+    },
+    {
+      type: "texture",
+      label: "Texture",
+    },
+    {
+      type: "redness",
+      label: "Redness",
+    },
+    {
+      type: "wrinkle",
+      label: "Wrinkles",
+    },
+    {
+      type: "age_spot",
+      label: "Age Spots",
+    },
+    {
+      type: "radiance",
+      label: "Radiance",
+    },
+    {
+      type: "firmness",
+      label: "Firmness",
+    },
   ];
 
+
+  /* =========================
+     RESET
+  ========================= */
+
   const resetAnalysis = () => {
-  setSelectedFile(null);
-  setResult(null);
-  setInsights(null);
-  setError("");
-  setAnalyzing(false);
-  setInsightsLoading(false);
-};
-    
-    
-    
-    
-  
+    setSelectedFile(null);
+    setResult(null);
+    setInsights(null);
+    setSelectedCategory(null);
+    setError("");
+    setAnalyzing(false);
+    setInsightsLoading(false);
+  };
+
+
+  /* =========================
+     UI
+  ========================= */
 
   return (
     <div className="app-shell">
+
       <div className="ambient ambient-one"></div>
       <div className="ambient ambient-two"></div>
 
+
+      {/* =========================
+          NAVBAR
+      ========================= */}
+
       <header className="navbar">
+
         <div className="brand">
+
           <div className="brand-mark">
             <Sparkles size={18} />
           </div>
 
+
           <div>
-            <div className="brand-name">SkinWise</div>
-            <div className="brand-ai">AI</div>
+            <div className="brand-name">
+              SkinWise
+            </div>
+
+            <div className="brand-ai">
+              AI
+            </div>
           </div>
+
         </div>
 
+
         <nav className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#how">How it works</a>
-          <a href="#insights">Insights</a>
+
+          <a href="#home">
+            Home
+          </a>
+
+          <a href="#how">
+            How it works
+          </a>
+
+          <a href="#insights">
+            Insights
+          </a>
+
         </nav>
+
 
         <button
           className="nav-button"
           onClick={() =>
             document
               .getElementById("analyzer")
-              ?.scrollIntoView({ behavior: "smooth" })
+              ?.scrollIntoView({
+                behavior: "smooth",
+              })
           }
         >
           Get Started
           <ArrowRight size={16} />
         </button>
+
       </header>
 
+
+      {/* =========================
+          MAIN
+      ========================= */}
+
       <main id="home">
+
         {!result ? (
+
           <>
-            <section className="hero" id="analyzer">
+            {/* =========================
+                HERO
+            ========================= */}
+
+            <section
+              className="hero"
+              id="analyzer"
+            >
+
               <div className="hero-copy">
+
                 <div className="eyebrow">
+
                   <span className="eyebrow-dot"></span>
+
                   AI-POWERED SKIN ANALYSIS
+
                 </div>
+
 
                 <h1>
                   Your skin.
                   <br />
-                  <span>Understood.</span>
+
+                  <span>
+                    Understood.
+                  </span>
                 </h1>
 
+
                 <p className="hero-text">
-                  Discover personalized skin insights powered by AI.
-                  Understand your skin and build a smarter skincare routine.
+                  Discover personalized skin insights
+                  powered by AI. Understand your skin
+                  and build a smarter skincare routine.
                 </p>
 
+
                 <div className="hero-points">
+
                   <div>
                     <ShieldCheck size={18} />
-                    <span>Private & secure</span>
+                    <span>
+                      Private & secure
+                    </span>
                   </div>
+
 
                   <div>
                     <ScanFace size={18} />
-                    <span>AI skin analysis</span>
+                    <span>
+                      AI skin analysis
+                    </span>
                   </div>
+
                 </div>
+
               </div>
 
+
+              {/* =========================
+                  UPLOAD CARD
+              ========================= */}
+
               <div className="upload-card">
+
                 <div className="card-glow"></div>
 
+
                 <div className="upload-card-header">
+
                   <div>
-                    <p className="mini-label">STEP 01</p>
-                    <h2>Analyze your skin</h2>
+
+                    <p className="mini-label">
+                      STEP 01
+                    </p>
+
+                    <h2>
+                      Analyze your skin
+                    </h2>
+
                   </div>
+
 
                   <div className="camera-icon">
                     <Camera size={20} />
                   </div>
+
                 </div>
+
 
                 <label
                   className={`drop-zone ${
-                    dragActive ? "drag-active" : ""
+                    dragActive
+                      ? "drag-active"
+                      : ""
                   }`}
                   onDragOver={(event) => {
                     event.preventDefault();
                     setDragActive(true);
                   }}
-                  onDragLeave={() => setDragActive(false)}
+                  onDragLeave={() =>
+                    setDragActive(false)
+                  }
                   onDrop={handleDrop}
                 >
+
                   <input
                     type="file"
                     accept="image/*"
@@ -397,49 +658,82 @@ try {
                     hidden
                   />
 
+
                   <div className="upload-icon">
                     <Upload size={24} />
                   </div>
 
+
                   {selectedFile ? (
+
                     <>
-                      <h3>{selectedFile.name}</h3>
-                      <p>Image selected successfully</p>
+                      <h3>
+                        {selectedFile.name}
+                      </h3>
+
+                      <p>
+                        Image selected successfully
+                      </p>
                     </>
+
                   ) : (
+
                     <>
-                      <h3>Upload your photo</h3>
+                      <h3>
+                        Upload your photo
+                      </h3>
+
                       <p>
                         Drag & drop your photo here
                         <br />
-                        or <span>browse from your device</span>
+                        or{" "}
+                        <span>
+                          browse from your device
+                        </span>
                       </p>
                     </>
+
                   )}
+
 
                   <div className="upload-format">
                     JPG / PNG · Clear face photo recommended
                   </div>
+
                 </label>
+
 
                 <button
                   className="analyze-button"
                   onClick={analyzeSkin}
-                  disabled={!selectedFile || analyzing}
+                  disabled={
+                    !selectedFile ||
+                    analyzing
+                  }
                 >
+
                   <Sparkles size={18} />
+
                   {analyzing
                     ? "Analyzing..."
                     : "Analyze My Skin"}
+
                   <ChevronRight size={18} />
+
                 </button>
 
+
                 <p className="privacy-note">
+
                   <ShieldCheck size={14} />
+
                   Your photo is processed securely.
+
                 </p>
 
+
                 {analyzing && (
+
                   <p
                     style={{
                       marginTop: "14px",
@@ -449,9 +743,12 @@ try {
                   >
                     🔍 Analyzing your skin...
                   </p>
+
                 )}
 
+
                 {error && (
+
                   <p
                     style={{
                       marginTop: "14px",
@@ -462,376 +759,921 @@ try {
                   >
                     {error}
                   </p>
+
                 )}
+
               </div>
+
             </section>
 
-            <section id="how" className="feature-strip">
-              <div className="feature">
-                <div className="feature-number">01</div>
-                <div>
-                  <h3>Upload</h3>
-                  <p>Take or choose a clear face photo.</p>
-                </div>
-              </div>
+
+            {/* =========================
+                HOW IT WORKS
+            ========================= */}
+
+            <section
+              id="how"
+              className="feature-strip"
+            >
 
               <div className="feature">
-                <div className="feature-number">02</div>
-                <div>
-                  <h3>Analyze</h3>
-                  <p>AI evaluates multiple skin characteristics.</p>
+
+                <div className="feature-number">
+                  01
                 </div>
+
+                <div>
+
+                  <h3>
+                    Upload
+                  </h3>
+
+                  <p>
+                    Take or choose a clear face photo.
+                  </p>
+
+                </div>
+
               </div>
 
+
               <div className="feature">
-                <div className="feature-number">03</div>
-                <div>
-                  <h3>Understand</h3>
-                  <p>Get personalized insights and guidance.</p>
+
+                <div className="feature-number">
+                  02
                 </div>
+
+                <div>
+
+                  <h3>
+                    Analyze
+                  </h3>
+
+                  <p>
+                    AI evaluates multiple skin characteristics.
+                  </p>
+
+                </div>
+
               </div>
+
+
+              <div className="feature">
+
+                <div className="feature-number">
+                  03
+                </div>
+
+                <div>
+
+                  <h3>
+                    Understand
+                  </h3>
+
+                  <p>
+                    Get personalized insights and guidance.
+                  </p>
+
+                </div>
+
+              </div>
+
             </section>
 
-            <section id="insights" className="preview-section">
+
+            {/* =========================
+                PREVIEW
+            ========================= */}
+
+            <section
+              id="insights"
+              className="preview-section"
+            >
+
               <div className="preview-heading">
-                <p className="mini-label">WHAT YOU'LL DISCOVER</p>
-                <h2>More than just a skin score.</h2>
+
+                <p className="mini-label">
+                  WHAT YOU'LL DISCOVER
+                </p>
+
+                <h2>
+                  More than just a skin score.
+                </h2>
+
               </div>
+
 
               <div className="preview-grid">
+
                 <div className="preview-card large">
+
                   <Sparkles size={20} />
-                  <h3>Personalized insights</h3>
+
+                  <h3>
+                    Personalized insights
+                  </h3>
+
                   <p>
-                    Turn skin-analysis data into simple,
-                    understandable recommendations.
+                    Turn skin-analysis data into
+                    simple, understandable recommendations.
                   </p>
+
                 </div>
 
+
                 <div className="preview-card">
+
                   <ScanFace size={20} />
-                  <h3>Multiple signals</h3>
+
+                  <h3>
+                    Multiple signals
+                  </h3>
+
                   <p>
-                    Explore texture, moisture, oiliness,
-                    pores and more.
+                    Explore texture, moisture,
+                    oiliness, pores and more.
                   </p>
+
                 </div>
 
+
                 <div className="preview-card">
+
                   <ShieldCheck size={20} />
-                  <h3>Privacy first</h3>
+
+                  <h3>
+                    Privacy first
+                  </h3>
+
                   <p>
-                    Designed with a secure image-processing
-                    experience.
+                    Designed with a secure
+                    image-processing experience.
                   </p>
+
                 </div>
+
               </div>
+
             </section>
+
           </>
+
         ) : (
+
+          /* =========================
+             RESULTS
+          ========================= */
+
           <section className="results-section">
+
+            {/* RESULTS HEADER */}
+
             <div className="results-header">
+
               <div>
-                <p className="mini-label">YOUR AI ANALYSIS</p>
-                <h1>Your Skin Insights</h1>
+
+                <p className="mini-label">
+                  YOUR AI ANALYSIS
+                </p>
+
+                <h1>
+                  Your Skin Insights
+                </h1>
+
                 <p>
                   Your YouCam-powered skin analysis is complete.
                 </p>
+
               </div>
+
 
               <button
                 className="nav-button"
                 onClick={resetAnalysis}
               >
+
                 <RotateCcw size={16} />
+
                 Analyze Again
+
               </button>
+
             </div>
+
+
+            {/* =========================
+                SCORE CARDS
+            ========================= */}
 
             <div className="score-grid">
+
               <div className="score-card main-score">
-                <p className="mini-label">OVERALL SKIN SCORE</p>
+
+                <p className="mini-label">
+                  OVERALL SKIN SCORE
+                </p>
+
 
                 <div className="big-score">
+
                   {overallScore?.score ?? "--"}
-                  <span>/100</span>
+
+                  <span>
+                    /100
+                  </span>
+
                 </div>
 
+
                 <p>
-                  Overall analysis score based on the detected
-                  skin characteristics.
+                  Overall analysis score based on
+                  the detected skin characteristics.
                 </p>
+
               </div>
+
 
               <div className="score-card">
-                <p className="mini-label">AI-ESTIMATED SKIN AGE</p>
+
+                <p className="mini-label">
+                  AI-ESTIMATED SKIN AGE
+                </p>
+
 
                 <div className="age-score">
+
                   {skinAge?.score ?? "--"}
-                  <span> yrs</span>
+
+                  <span>
+                    {" "}yrs
+                  </span>
+
                 </div>
 
+
                 <p>
-                  This is an AI analysis estimate, not a medical
-                  or biological age measurement.
+                  This is an AI analysis estimate,
+                  not a medical or biological age measurement.
                 </p>
+
               </div>
+
             </div>
 
+
+            {/* =========================
+                METRICS
+            ========================= */}
+
             <div className="metrics-section">
+
               <div className="metrics-heading">
-                <p className="mini-label">SKIN CHARACTERISTICS</p>
-                <h2>Detailed analysis</h2>
+
+                <p className="mini-label">
+                  SKIN CHARACTERISTICS
+                </p>
+
+                <h2>
+                  Detailed analysis
+                </h2>
+
               </div>
 
+
               <div className="metrics-grid">
+
                 {metrics.map((metric) => {
-                  const item = getMetric(metric.type);
-                  const score = item?.ui_score;
+
+                  const item =
+                    getMetric(metric.type);
+
+                  const score =
+                    item?.ui_score;
+
 
                   return (
-                    <div className="metric-card" key={metric.type}>
+
+                    <div
+                      className="metric-card"
+                      key={metric.type}
+                    >
+
                       <div className="metric-top">
-                        <h3>{metric.label}</h3>
+
+                        <h3>
+                          {metric.label}
+                        </h3>
 
                         <span className="metric-score">
                           {score ?? "--"}
                         </span>
+
                       </div>
 
+
                       <div className="metric-bar">
+
                         <div
                           className="metric-bar-fill"
                           style={{
                             width: `${Math.min(
-                              Math.max(score || 0, 0),
+                              Math.max(
+                                score || 0,
+                                0
+                              ),
                               100
                             )}%`,
                           }}
                         ></div>
+
                       </div>
 
+
                       <p>
-                        AI analysis score for {metric.label.toLowerCase()}.
+                        AI analysis score for{" "}
+                        {metric.label.toLowerCase()}.
                       </p>
+
                     </div>
+
                   );
+
                 })}
+
               </div>
+
             </div>
+
+
+            {/* =========================
+                AI LOADING
+            ========================= */}
+
             {insightsLoading && (
-  <section className="ai-insights-section">
-    <div className="ai-insights-loading">
-      <Sparkles size={22} />
-      <div>
-        <h3>Creating your personalized insights...</h3>
-        <p>
-          SkinWise AI is turning your analysis into
-          simple skincare guidance.
-        </p>
-      </div>
-    </div>
-  </section>
-)}
 
-{insights && (
-  <section className="ai-insights-section">
-    <div className="ai-insights-heading">
-      <p className="mini-label">POWERED BY AI</p>
-      <h2>Your Personalized Skincare Guide</h2>
-      <p>
-        Guidance generated from your YouCam skin-analysis
-        results.
-      </p>
-    </div>
+              <section className="ai-insights-section">
 
-    <div className="profile-card">
-      <div className="profile-icon">
-        <Sparkles size={20} />
-      </div>
+                <div className="ai-insights-loading">
 
-      <div>
-        <h3>AI Skin Profile</h3>
-        <p>{insights.profile_summary}</p>
-      </div>
-    </div>
+                  <Sparkles size={22} />
 
-    <div className="insight-grid">
-      <div className="insight-card">
-        <div className="insight-card-title">
-          <ScanFace size={20} />
-          <h3>Focus Areas</h3>
-        </div>
+                  <div>
 
-        <div className="tag-list">
-          {insights.focus_areas?.map((area, index) => (
-            <span className="insight-tag" key={index}>
-              {area}
-            </span>
-          ))}
-        </div>
-      </div>
+                    <h3>
+                      Creating your personalized insights...
+                    </h3>
 
-      <div className="insight-card">
-        <div className="insight-card-title">
-          <Sparkles size={20} />
-          <h3>Product Categories</h3>
-        </div>
+                    <p>
+                      SkinWise AI is turning your
+                      analysis into simple skincare guidance.
+                    </p>
 
-        <div className="tag-list">
-          {insights.product_categories?.map(
-            (category, index) => (
-              <span className="insight-tag" key={index}>
-                {category}
-              </span>
-            )
-          )}
-        </div>
-      </div>
-      <div className="shop-section">
-  <div className="section-label">SKINWISE SHOP</div>
+                  </div>
 
-  <div className="shop-heading">
-    <div>
-      <h2>Recommended Product Categories</h2>
-      <p>
-        Explore cosmetic product categories based on your
-        SkinWise AI guidance.
-      </p>
-    </div>
-  </div>
+                </div>
 
-  <div className="product-category-grid">
-    {insights.product_categories?.map((category, index) => (
-      <article
-        className="product-category-card"
-        key={category}
-      >
-        <div className="product-category-number">
-          {String(index + 1).padStart(2, "0")}
-        </div>
+              </section>
 
-        <div className="product-category-content">
-          <h3>{category}</h3>
+            )}
 
-          <p>
-            A cosmetic category selected from your
-            SkinWise AI skincare guidance.
-          </p>
 
-          <button
-  type="button"
-  className="category-button"
-  onClick={() => setSelectedCategory(category)}
->
-  Explore Category
-</button>
-            
-            
-          
-            
-          
-        </div>
-      </article>
-    ))}
-  </div>
-</div>
-    </div>
+            {/* =========================
+                AI INSIGHTS
+            ========================= */}
 
-    <div className="routine-grid">
-      <div className="routine-card morning">
-        <div className="routine-header">
-          <span className="routine-number">AM</span>
-          <div>
-            <p className="mini-label">MORNING</p>
-            <h3>Morning Routine</h3>
-          </div>
-        </div>
+            {insights && (
 
-        <div className="routine-list">
-          {insights.morning_routine?.map(
-            (step, index) => (
-              <div className="routine-step" key={index}>
-                <span>{index + 1}</span>
-                <p>{step}</p>
-              </div>
-            )
-          )}
-        </div>
-      </div>
+              <section className="ai-insights-section">
 
-      <div className="routine-card evening">
-        <div className="routine-header">
-          <span className="routine-number">PM</span>
-          <div>
-            <p className="mini-label">EVENING</p>
-            <h3>Evening Routine</h3>
-          </div>
-        </div>
+                <div className="ai-insights-heading">
 
-        <div className="routine-list">
-          {insights.evening_routine?.map(
-            (step, index) => (
-              <div className="routine-step" key={index}>
-                <span>{index + 1}</span>
-                <p>{step}</p>
-              </div>
-            )
-          )}
-        </div>
-      </div>
-    </div>
+                  <p className="mini-label">
+                    POWERED BY AI
+                  </p>
 
-    <div className="ai-safety-note">
-      <ShieldCheck size={19} />
+                  <h2>
+                    Your Personalized Skincare Guide
+                  </h2>
 
-      <div>
-        <h3>SkinWise AI Note</h3>
-        <p>{insights.note}</p>
-      </div>
-    </div>
-  </section>
-)}
+                  <p>
+                    Guidance generated from your
+                    YouCam skin-analysis results.
+                  </p>
+
+                </div>
+
+
+                {/* PROFILE */}
+
+                <div className="profile-card">
+
+                  <div className="profile-icon">
+                    <Sparkles size={20} />
+                  </div>
+
+
+                  <div>
+
+                    <h3>
+                      AI Skin Profile
+                    </h3>
+
+                    <p>
+                      {insights.profile_summary}
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================
+                    FOCUS + PRODUCT TAGS
+                ========================= */}
+
+                <div className="insight-grid">
+
+                  <div className="insight-card">
+
+                    <div className="insight-card-title">
+
+                      <ScanFace size={20} />
+
+                      <h3>
+                        Focus Areas
+                      </h3>
+
+                    </div>
+
+
+                    <div className="tag-list">
+
+                      {insights.focus_areas?.map(
+                        (area, index) => (
+
+                          <span
+                            className="insight-tag"
+                            key={index}
+                          >
+                            {area}
+                          </span>
+
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="insight-card">
+
+                    <div className="insight-card-title">
+
+                      <Sparkles size={20} />
+
+                      <h3>
+                        Product Categories
+                      </h3>
+
+                    </div>
+
+
+                    <div className="tag-list">
+
+                      {insights.product_categories?.map(
+                        (category, index) => (
+
+                          <span
+                            className="insight-tag"
+                            key={index}
+                          >
+                            {category}
+                          </span>
+
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================
+                    SKINWISE SHOP
+                ========================= */}
+
+                <div className="shop-section">
+
+                  <div className="section-label">
+                    SKINWISE SHOP
+                  </div>
+
+
+                  <div className="shop-heading">
+
+                    <div>
+
+                      <h2>
+                        Recommended Product Categories
+                      </h2>
+
+                      <p>
+                        Explore cosmetic product categories
+                        based on your SkinWise AI guidance.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="product-category-grid">
+
+                    {insights.product_categories?.map(
+                      (category, index) => (
+
+                        <article
+                          className="product-category-card"
+                          key={category}
+                        >
+
+                          <div className="product-category-number">
+
+                            {String(index + 1).padStart(
+                              2,
+                              "0"
+                            )}
+
+                          </div>
+
+
+                          <div className="product-category-content">
+
+                            <h3>
+                              {category}
+                            </h3>
+
+
+                            <p>
+                              A cosmetic category selected
+                              from your SkinWise AI skincare guidance.
+                            </p>
+
+
+                            <button
+                              type="button"
+                              className="category-button"
+                              onClick={() =>
+                                setSelectedCategory(category)
+                              }
+                            >
+                              Explore Category
+                            </button>
+
+                          </div>
+
+                        </article>
+
+                      )
+                    )}
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================
+                    PRODUCT CATEGORY MODAL
+                ========================= */}
+
+                {selectedCategory && (
+
+                  <div
+                    className="product-modal-overlay"
+                    onClick={() =>
+                      setSelectedCategory(null)
+                    }
+                  >
+
+                    <div
+                      className="product-modal"
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                    >
+
+                      <button
+                        type="button"
+                        className="product-modal-close"
+                        onClick={() =>
+                          setSelectedCategory(null)
+                        }
+                        aria-label="Close product category"
+                      >
+                        ×
+                      </button>
+
+
+                      <p className="mini-label">
+                        SKINWISE SHOP
+                      </p>
+
+
+                      <h2>
+                        {selectedCategory}
+                      </h2>
+
+
+                      <p className="product-modal-subtitle">
+                        Explore cosmetic options within
+                        this SkinWise AI product category.
+                      </p>
+
+
+                      <div className="product-list">
+
+                        {productCatalog[
+                          selectedCategory
+                        ]?.map(
+                          (product, index) => (
+
+                            <div
+                              className="product-item"
+                              key={index}
+                            >
+
+                              <div>
+
+                                <h3>
+                                  {product.name}
+                                </h3>
+
+                                <p>
+                                  {product.description}
+                                </p>
+
+                              </div>
+
+
+                              <span className="product-category-label">
+                                {product.category}
+                              </span>
+
+                            </div>
+
+                          )
+                        )}
+
+                      </div>
+
+
+                      <button
+                        type="button"
+                        className="category-button modal-close-button"
+                        onClick={() =>
+                          setSelectedCategory(null)
+                        }
+                      >
+                        Close
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+                {/* =========================
+                    MORNING + EVENING
+                ========================= */}
+
+                <div className="routine-grid">
+
+                  {/* MORNING */}
+
+                  <div className="routine-card morning">
+
+                    <div className="routine-header">
+
+                      <span className="routine-number">
+                        AM
+                      </span>
+
+
+                      <div>
+
+                        <p className="mini-label">
+                          MORNING
+                        </p>
+
+                        <h3>
+                          Morning Routine
+                        </h3>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="routine-list">
+
+                      {insights.morning_routine?.map(
+                        (step, index) => (
+
+                          <div
+                            className="routine-step"
+                            key={index}
+                          >
+
+                            <span>
+                              {index + 1}
+                            </span>
+
+                            <p>
+                              {step}
+                            </p>
+
+                          </div>
+
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+
+
+                  {/* EVENING */}
+
+                  <div className="routine-card evening">
+
+                    <div className="routine-header">
+
+                      <span className="routine-number">
+                        PM
+                      </span>
+
+
+                      <div>
+
+                        <p className="mini-label">
+                          EVENING
+                        </p>
+
+                        <h3>
+                          Evening Routine
+                        </h3>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="routine-list">
+
+                      {insights.evening_routine?.map(
+                        (step, index) => (
+
+                          <div
+                            className="routine-step"
+                            key={index}
+                          >
+
+                            <span>
+                              {index + 1}
+                            </span>
+
+                            <p>
+                              {step}
+                            </p>
+
+                          </div>
+
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================
+                    AI SAFETY NOTE
+                ========================= */}
+
+                <div className="ai-safety-note">
+
+                  <ShieldCheck size={19} />
+
+                  <div>
+
+                    <h3>
+                      SkinWise AI Note
+                    </h3>
+
+                    <p>
+                      {insights.note}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </section>
+
+            )}
+
+
+            {/* =========================
+                GENERAL RESULT NOTE
+            ========================= */}
 
             <div className="result-note">
+
               <ShieldCheck size={20} />
 
               <div>
-                <h3>SkinWise AI Insight</h3>
+
+                <h3>
+                  SkinWise AI Insight
+                </h3>
+
                 <p>
-                  These results are AI-generated skin-analysis
-                  insights intended for cosmetic and skincare
-                  guidance. They are not a medical diagnosis.
+                  These results are AI-generated
+                  skin-analysis insights intended for
+                  cosmetic and skincare guidance.
+                  They are not a medical diagnosis.
                 </p>
+
               </div>
+
             </div>
+
+
+            {/* =========================
+                ANALYZE AGAIN
+            ========================= */}
 
             <button
               className="analyze-button result-button"
               onClick={resetAnalysis}
             >
+
               <RotateCcw size={18} />
+
               Analyze Another Photo
+
               <ChevronRight size={18} />
+
             </button>
+
           </section>
+
         )}
+
       </main>
 
+
+      {/* =========================
+          FOOTER
+      ========================= */}
+
       <footer>
+
         <div className="brand footer-brand">
+
           <div className="brand-mark">
             <Sparkles size={16} />
           </div>
 
+
           <div>
-            <div className="brand-name">SkinWise</div>
-            <div className="brand-ai">AI</div>
+
+            <div className="brand-name">
+              SkinWise
+            </div>
+
+            <div className="brand-ai">
+              AI
+            </div>
+
           </div>
+
         </div>
 
-        <p>AI-powered skincare intelligence.</p>
+
+        <p>
+          AI-powered skincare intelligence.
+        </p>
+
       </footer>
+
     </div>
   );
 }
