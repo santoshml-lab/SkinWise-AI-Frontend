@@ -16,6 +16,8 @@ function App() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [insights, setInsights] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -111,6 +113,65 @@ function App() {
       }
 
       setResult(finalResult);
+
+const output = finalResult?.data?.results?.output || [];
+
+const scores = output
+  .filter((item) =>
+    [
+      "all",
+      "acne",
+      "moisture",
+      "oiliness",
+      "pore",
+      "texture",
+      "redness",
+      "wrinkle",
+      "age_spot",
+      "radiance",
+      "firmness",
+    ].includes(item.type)
+  )
+  .map((item) => ({
+    type: item.type,
+    ...(item.score !== undefined
+      ? { score: item.score }
+      : { ui_score: item.ui_score }),
+  }));
+
+setInsightsLoading(true);
+
+try {
+  const insightResponse = await fetch(
+    `${import.meta.env.VITE_API_URL}/personalized-insights`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scores,
+      }),
+    }
+  );
+
+  const insightData = await insightResponse.json();
+
+  if (!insightResponse.ok) {
+    throw new Error(
+      insightData.detail || "Could not generate AI insights."
+    );
+  }
+
+  setInsights(insightData.insights);
+} catch (insightError) {
+  console.error("AI insights error:", insightError);
+  setError(
+    insightError.message || "Could not generate personalized insights."
+  );
+} finally {
+  setInsightsLoading(false);
+}
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -143,11 +204,18 @@ function App() {
   ];
 
   const resetAnalysis = () => {
-    setSelectedFile(null);
-    setResult(null);
-    setError("");
-    setAnalyzing(false);
-  };
+  setSelectedFile(null);
+  setResult(null);
+  setInsights(null);
+  setError("");
+  setAnalyzing(false);
+  setInsightsLoading(false);
+};
+    
+    
+    
+    
+  
 
   return (
     <div className="app-shell">
@@ -473,6 +541,131 @@ function App() {
                 })}
               </div>
             </div>
+            {insightsLoading && (
+  <section className="ai-insights-section">
+    <div className="ai-insights-loading">
+      <Sparkles size={22} />
+      <div>
+        <h3>Creating your personalized insights...</h3>
+        <p>
+          SkinWise AI is turning your analysis into
+          simple skincare guidance.
+        </p>
+      </div>
+    </div>
+  </section>
+)}
+
+{insights && (
+  <section className="ai-insights-section">
+    <div className="ai-insights-heading">
+      <p className="mini-label">POWERED BY AI</p>
+      <h2>Your Personalized Skincare Guide</h2>
+      <p>
+        Guidance generated from your YouCam skin-analysis
+        results.
+      </p>
+    </div>
+
+    <div className="profile-card">
+      <div className="profile-icon">
+        <Sparkles size={20} />
+      </div>
+
+      <div>
+        <h3>AI Skin Profile</h3>
+        <p>{insights.profile_summary}</p>
+      </div>
+    </div>
+
+    <div className="insight-grid">
+      <div className="insight-card">
+        <div className="insight-card-title">
+          <ScanFace size={20} />
+          <h3>Focus Areas</h3>
+        </div>
+
+        <div className="tag-list">
+          {insights.focus_areas?.map((area, index) => (
+            <span className="insight-tag" key={index}>
+              {area}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="insight-card">
+        <div className="insight-card-title">
+          <Sparkles size={20} />
+          <h3>Product Categories</h3>
+        </div>
+
+        <div className="tag-list">
+          {insights.product_categories?.map(
+            (category, index) => (
+              <span className="insight-tag" key={index}>
+                {category}
+              </span>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div className="routine-grid">
+      <div className="routine-card morning">
+        <div className="routine-header">
+          <span className="routine-number">AM</span>
+          <div>
+            <p className="mini-label">MORNING</p>
+            <h3>Morning Routine</h3>
+          </div>
+        </div>
+
+        <div className="routine-list">
+          {insights.morning_routine?.map(
+            (step, index) => (
+              <div className="routine-step" key={index}>
+                <span>{index + 1}</span>
+                <p>{step}</p>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+
+      <div className="routine-card evening">
+        <div className="routine-header">
+          <span className="routine-number">PM</span>
+          <div>
+            <p className="mini-label">EVENING</p>
+            <h3>Evening Routine</h3>
+          </div>
+        </div>
+
+        <div className="routine-list">
+          {insights.evening_routine?.map(
+            (step, index) => (
+              <div className="routine-step" key={index}>
+                <span>{index + 1}</span>
+                <p>{step}</p>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div className="ai-safety-note">
+      <ShieldCheck size={19} />
+
+      <div>
+        <h3>SkinWise AI Note</h3>
+        <p>{insights.note}</p>
+      </div>
+    </div>
+  </section>
+)}
 
             <div className="result-note">
               <ShieldCheck size={20} />
