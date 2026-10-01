@@ -610,6 +610,48 @@ try {
           )}
         </div>
       </div>
+      <div className="shop-section">
+  <div className="section-label">SKINWISE SHOP</div>
+
+  <div className="shop-heading">
+    <div>
+      <h2>Recommended Product Categories</h2>
+      <p>
+        Explore cosmetic product categories based on your
+        SkinWise AI guidance.
+      </p>
+    </div>
+  </div>
+
+  <div className="product-category-grid">
+    {insights.product_categories?.map((category, index) => (
+      <article
+        className="product-category-card"
+        key={category}
+      >
+        <div className="product-category-number">
+          {String(index + 1).padStart(2, "0")}
+        </div>
+
+        <div className="product-category-content">
+          <h3>{category}</h3>
+
+          <p>
+            A cosmetic category selected from your
+            SkinWise AI skincare guidance.
+          </p>
+
+          <button
+            type="button"
+            className="category-button"
+          >
+            Explore Category
+          </button>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>
     </div>
 
     <div className="routine-grid">
