@@ -10,10 +10,88 @@ import {
   RotateCcw,
 } from "lucide-react";
 
+const productCatalog = {
+  "Gentle cleansers": [
+    {
+      name: "Gentle Daily Cleanser",
+      description:
+        "A simple cosmetic cleanser category for everyday cleansing.",
+      category: "Gentle cleansers",
+    },
+    {
+      name: "Hydrating Cream Cleanser",
+      description:
+        "A gentle cleanser category designed for a comfortable cleansing routine.",
+      category: "Gentle cleansers",
+    },
+  ],
+
+  "Hydrating toners": [
+    {
+      name: "Hydrating Daily Toner",
+      description:
+        "A lightweight hydrating toner category for a simple skincare routine.",
+      category: "Hydrating toners",
+    },
+    {
+      name: "Gentle Hydration Toner",
+      description:
+        "A cosmetic toner category focused on adding hydration to the routine.",
+      category: "Hydrating toners",
+    },
+  ],
+
+  "Hydrating serums": [
+    {
+      name: "Daily Hydrating Serum",
+      description:
+        "A lightweight cosmetic serum category for hydration support.",
+      category: "Hydrating serums",
+    },
+    {
+      name: "Hydration Support Serum",
+      description:
+        "A simple serum category that fits a hydration-focused routine.",
+      category: "Hydrating serums",
+    },
+  ],
+
+  "Lightweight moisturizers": [
+    {
+      name: "Lightweight Daily Moisturizer",
+      description:
+        "A lightweight moisturizer category for everyday cosmetic skincare.",
+      category: "Lightweight moisturizers",
+    },
+    {
+      name: "Daily Barrier Moisturizer",
+      description:
+        "A simple moisturizer category for supporting a comfortable skincare routine.",
+      category: "Lightweight moisturizers",
+    },
+  ],
+
+  "Broad-spectrum SPF 30+ sunscreens": [
+    {
+      name: "Broad-Spectrum SPF 30+ Sunscreen",
+      description:
+        "A daily sunscreen category for broad-spectrum sun protection.",
+      category: "Broad-spectrum SPF 30+ sunscreens",
+    },
+    {
+      name: "Daily SPF 30+ Sunscreen",
+      description:
+        "A cosmetic sunscreen category for everyday sun protection.",
+      category: "Broad-spectrum SPF 30+ sunscreens",
+    },
+  ],
+};
+
 function App() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [insights, setInsights] = useState(null);
@@ -642,11 +720,17 @@ try {
           </p>
 
           <button
-            type="button"
-            className="category-button"
-          >
-            Explore Category
-          </button>
+  type="button"
+  className="category-button"
+  onClick={() => setSelectedCategory(category)}
+>
+  Explore Category
+</button>
+            
+            
+          
+            
+          
         </div>
       </article>
     ))}
