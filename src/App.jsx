@@ -69,31 +69,56 @@ const [error, setError] = useState("");
 
       let finalResult = null;
 
-      for (let i = 0; i < 30; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+for (let i = 0; i < 18; i++) {
+  await new Promise((resolve) => setTimeout(resolve, 10000));
 
-        const resultResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/skin-result/${taskId}`
-        );
+  const resultResponse = await fetch(
+    `${import.meta.env.VITE_API_URL}/skin-result/${taskId}`
+  );
 
-        const resultData = await resultResponse.json();
+  const resultData = await resultResponse.json();
 
-        if (!resultResponse.ok) {
-          throw new Error(
-            resultData.detail || "Could not fetch skin result."
-          );
-        }
+  if (!resultResponse.ok) {
+    throw new Error(
+      resultData.detail || "Could not fetch skin result."
+    );
+  }
 
-        if (
-  resultData?.data?.task_status === "success" ||
-  resultData?.data?.status === "success" ||
-  resultData?.task_status === "success" ||
-  resultData?.status === "success"
-) {
-          finalResult = resultData;
-          break;
-        }
-      }
+  const taskStatus = resultData?.data?.task_status;
+
+  console.log("YouCam task status:", taskStatus);
+
+  if (taskStatus === "success") {
+    finalResult = resultData;
+    break;
+  }
+
+  if (taskStatus === "error") {
+    throw new Error(
+      resultData?.data?.error_message ||
+      resultData?.data?.error ||
+      "YouCam skin analysis failed."
+    );
+  }
+}
+
+      
+        
+
+    
+          
+      
+
+        
+  
+  
+  
+  
+
+          
+          
+        
+      
 
       if (!finalResult) {
         throw new Error("Analysis is taking too long. Please try again.");
