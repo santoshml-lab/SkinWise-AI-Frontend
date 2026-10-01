@@ -87,6 +87,9 @@ for (let i = 0; i < 18; i++) {
   const taskStatus = resultData?.data?.task_status;
 
   console.log("YouCam task status:", taskStatus);
+  if (taskStatus !== "success") {
+  setError(`YouCam status: ${taskStatus || "unknown"}`);
+  }
 
   if (taskStatus === "success") {
     finalResult = resultData;
