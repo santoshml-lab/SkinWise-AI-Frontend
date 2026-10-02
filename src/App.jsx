@@ -1031,6 +1031,42 @@ function App() {
         )}
       </main>
 
+      <section className="final-cta">
+  <div className="final-cta-glow"></div>
+
+  <div className="final-cta-content">
+    <p className="mini-label">START YOUR SKIN JOURNEY</p>
+
+    <h2>
+      Your skin deserves
+      <br />
+      <span>to be understood.</span>
+    </h2>
+
+    <p>
+      Get personalized skin insights and a simple skincare
+      routine powered by AI.
+    </p>
+
+    <button
+      className="final-cta-button"
+      onClick={() =>
+        document
+          .getElementById("analyzer")
+          ?.scrollIntoView({ behavior: "smooth" })
+      }
+    >
+      Analyze My Skin
+      <ArrowRight size={18} />
+    </button>
+
+    <div className="final-cta-note">
+      <ShieldCheck size={15} />
+      <span>Private & secure image processing</span>
+    </div>
+  </div>
+</section>
+
       <footer>
         <div className="brand footer-brand">
           <div className="brand-mark">
