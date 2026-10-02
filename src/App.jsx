@@ -519,41 +519,85 @@ function App() {
               
       
 
-            <section id="insights" className="preview-section">
-              <div className="preview-heading">
-                <p className="mini-label">WHAT YOU'LL DISCOVER</p>
-                <h2>More than just a skin score.</h2>
-              </div>
+            <section id="insights" className="benefits-section">
+  <div className="benefits-heading">
+    <p className="mini-label">WHY SKINWISE AI</p>
 
-              <div className="preview-grid">
-                <div className="preview-card large">
-                  <Sparkles size={20} />
-                  <h3>Personalized insights</h3>
-                  <p>
-                    Turn skin-analysis data into simple,
-                    understandable recommendations.
-                  </p>
-                </div>
+    <h2>
+      More than just
+      <br />
+      <span>a skin score.</span>
+    </h2>
 
-                <div className="preview-card">
-                  <ScanFace size={20} />
-                  <h3>Multiple signals</h3>
-                  <p>
-                    Explore texture, moisture, oiliness,
-                    pores and more.
-                  </p>
-                </div>
+    <p>
+      SkinWise AI helps turn skin-analysis data into
+      simple, understandable skincare guidance.
+    </p>
+  </div>
 
-                <div className="preview-card">
-                  <ShieldCheck size={20} />
-                  <h3>Privacy first</h3>
-                  <p>
-                    Designed with a secure image-processing
-                    experience.
-                  </p>
-                </div>
-              </div>
-            </section>
+  <div className="benefits-grid">
+    <article className="benefit-card benefit-large">
+      <div className="benefit-icon">
+        <ShieldCheck size={22} />
+      </div>
+
+      <div>
+        <p className="benefit-label">01 · PRIVACY</p>
+        <h3>Privacy first</h3>
+        <p>
+          Your photo is processed securely so you can
+          explore your skin insights with confidence.
+        </p>
+      </div>
+    </article>
+
+    <article className="benefit-card">
+      <div className="benefit-icon">
+        <Sparkles size={22} />
+      </div>
+
+      <p className="benefit-label">02 · INTELLIGENCE</p>
+
+      <h3>AI-powered insights</h3>
+
+      <p>
+        Turn structured skin-analysis results into
+        clear, easy-to-understand guidance.
+      </p>
+    </article>
+
+    <article className="benefit-card">
+      <div className="benefit-icon">
+        <ScanFace size={22} />
+      </div>
+
+      <p className="benefit-label">03 · PERSONALIZED</p>
+
+      <h3>Made for your skin journey</h3>
+
+      <p>
+        Explore focus areas, cosmetic categories and
+        simple routines based on your analysis.
+      </p>
+    </article>
+
+    <article className="benefit-card">
+      <div className="benefit-icon">
+        <ArrowRight size={22} />
+      </div>
+
+      <p className="benefit-label">04 · ACTIONABLE</p>
+
+      <h3>From insight to action</h3>
+
+      <p>
+        Move from analysis to practical skincare steps
+        without overwhelming complexity.
+      </p>
+    </article>
+  </div>
+</section>
+              
           </>
         ) : (
           <section className="results-section">
