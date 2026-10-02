@@ -367,11 +367,23 @@ function App() {
       </div>
 
       {selectedFile ? (
-        <>
-          <h3>{selectedFile.name}</h3>
-          <p>Image selected successfully</p>
-        </>
-      ) : (
+  <>
+    <div className="selected-image-preview">
+      <img
+        src={URL.createObjectURL(selectedFile)}
+        alt="Selected skin analysis photo"
+      />
+    </div>
+
+    <h3>{selectedFile.name}</h3>
+    <p>Image selected successfully</p>
+  </>
+) : (
+        
+          
+          
+        
+      
         <>
           <h3>Upload your photo</h3>
           <p>
