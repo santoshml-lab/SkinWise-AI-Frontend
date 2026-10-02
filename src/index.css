@@ -1944,6 +1944,22 @@ a:focus-visible,
     height: 34px;
   }
 }
+
+/* Mobile upload card spacing fix */
+@media (max-width: 600px) {
+  .upload-card {
+    padding-top: 28px;
+    padding-bottom: 24px;
+  }
+
+  .upload-card-header {
+    margin-bottom: 20px;
+  }
+
+  .drop-zone {
+    min-height: 250px;
+  }
+}
   
     
   
