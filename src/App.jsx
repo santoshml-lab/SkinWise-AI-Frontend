@@ -440,31 +440,84 @@ function App() {
                   
                   
 
-            <section id="how" className="feature-strip">
-              <div className="feature">
-                <div className="feature-number">01</div>
-                <div>
-                  <h3>Upload</h3>
-                  <p>Take or choose a clear face photo.</p>
-                </div>
-              </div>
+            <section id="how" className="how-section">
+  <div className="how-heading">
+    <p className="mini-label">HOW IT WORKS</p>
 
-              <div className="feature">
-                <div className="feature-number">02</div>
-                <div>
-                  <h3>Analyze</h3>
-                  <p>AI evaluates multiple skin characteristics.</p>
-                </div>
-              </div>
+    <h2>
+      From photo to
+      <br />
+      <span>personalized guidance.</span>
+    </h2>
 
-              <div className="feature">
-                <div className="feature-number">03</div>
-                <div>
-                  <h3>Understand</h3>
-                  <p>Get personalized insights and guidance.</p>
-                </div>
-              </div>
-            </section>
+    <p>
+      SkinWise AI turns a simple photo into clear,
+      personalized skincare guidance in four simple steps.
+    </p>
+  </div>
+
+  <div className="how-grid">
+    <article className="how-card">
+      <div className="how-number">01</div>
+
+      <div className="how-icon">
+        <Upload size={22} />
+      </div>
+
+      <h3>Upload Photo</h3>
+
+      <p>
+        Upload a clear face photo from your device.
+      </p>
+    </article>
+
+    <article className="how-card">
+      <div className="how-number">02</div>
+
+      <div className="how-icon">
+        <ScanFace size={22} />
+      </div>
+
+      <h3>AI Analysis</h3>
+
+      <p>
+        YouCam AI analyzes multiple skin characteristics.
+      </p>
+    </article>
+
+    <article className="how-card">
+      <div className="how-number">03</div>
+
+      <div className="how-icon">
+        <Sparkles size={22} />
+      </div>
+
+      <h3>Get Insights</h3>
+
+      <p>
+        Receive simple, personalized skincare guidance.
+      </p>
+    </article>
+
+    <article className="how-card">
+      <div className="how-number">04</div>
+
+      <div className="how-icon">
+        <ShieldCheck size={22} />
+      </div>
+
+      <h3>Follow Your Routine</h3>
+
+      <p>
+        Explore a simple morning and evening routine.
+      </p>
+    </article>
+  </div>
+</section>
+              
+                
+              
+      
 
             <section id="insights" className="preview-section">
               <div className="preview-heading">
