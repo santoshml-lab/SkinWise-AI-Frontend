@@ -2005,6 +2005,31 @@ a:focus-visible,
     margin-top: 0 !important;
   }
 }
+
+/* Fix upload card glow taking layout space */
+.upload-card .card-glow {
+  position: absolute !important;
+  z-index: 0 !important;
+  inset: 0 !important;
+  pointer-events: none;
+}
+
+.upload-card > .upload-card-header,
+.upload-card > .drop-zone,
+.upload-card > .analyze-button,
+.upload-card > .privacy-note,
+.upload-card > p {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .upload-card {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 30px 24px 24px !important;
+  }
+}
   
     
   
