@@ -273,136 +273,172 @@ function App() {
         {!result ? (
           <>
             <section className="hero" id="analyzer">
-              <div className="hero-copy">
-                <div className="eyebrow">
-                  <span className="eyebrow-dot"></span>
-                  AI-POWERED SKIN ANALYSIS
-                </div>
+  <div className="hero-copy">
+    <div className="eyebrow">
+      <span className="eyebrow-dot"></span>
+      AI-POWERED SKIN ANALYSIS
+    </div>
 
-                <h1>
-                  Your skin.
-                  <br />
-                  <span>Understood.</span>
-                </h1>
+    <h1>
+      Your skin.
+      <br />
+      <span>Understood.</span>
+    </h1>
 
-                <p className="hero-text">
-                  Discover personalized skin insights powered by AI.
-                  Understand your skin and build a smarter skincare routine.
-                </p>
+    <p className="hero-text">
+      Discover personalized skin insights powered by AI.
+      Understand your skin and build a smarter skincare routine.
+    </p>
 
-                <div className="hero-points">
-                  <div>
-                    <ShieldCheck size={18} />
-                    <span>Private & secure</span>
-                  </div>
+    <div className="hero-points">
+      <div>
+        <ShieldCheck size={18} />
+        <span>Private & secure</span>
+      </div>
 
-                  <div>
-                    <ScanFace size={18} />
-                    <span>AI skin analysis</span>
-                  </div>
-                </div>
-              </div>
+      <div>
+        <ScanFace size={18} />
+        <span>AI skin analysis</span>
+      </div>
+    </div>
 
-              <div className="upload-card">
-                <div className="card-glow"></div>
+    {/* Hero Image */}
+    <div className="hero-visual">
+      <div className="hero-image-card">
+        <img
+          src="/hero-skin.jpg"
+          alt="AI-powered skincare analysis"
+        />
 
-                <div className="upload-card-header">
-                  <div>
-                    <p className="mini-label">STEP 01</p>
-                    <h2>Analyze your skin</h2>
-                  </div>
+        <div className="hero-ai-badge">
+          <Sparkles size={15} />
+          <span>AI Skin Insight</span>
+        </div>
 
-                  <div className="camera-icon">
-                    <Camera size={20} />
-                  </div>
-                </div>
+        <div className="hero-analysis-card">
+          <div className="hero-analysis-icon">
+            <ScanFace size={17} />
+          </div>
 
-                <label
-                  className={`drop-zone ${
-                    dragActive ? "drag-active" : ""
-                  }`}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setDragActive(true);
-                  }}
-                  onDragLeave={() => setDragActive(false)}
-                  onDrop={handleDrop}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    hidden
-                  />
+          <div>
+            <strong>Skin analysis ready</strong>
+            <span>Personalized insights</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                  <div className="upload-icon">
-                    <Upload size={24} />
-                  </div>
+  {/* Upload / Analyzer Card */}
+  <div className="upload-card">
+    <div className="card-glow"></div>
 
-                  {selectedFile ? (
-                    <>
-                      <h3>{selectedFile.name}</h3>
-                      <p>Image selected successfully</p>
-                    </>
-                  ) : (
-                    <>
-                      <h3>Upload your photo</h3>
-                      <p>
-                        Drag & drop your photo here
-                        <br />
-                        or <span>browse from your device</span>
-                      </p>
-                    </>
-                  )}
+    <div className="upload-card-header">
+      <div>
+        <p className="mini-label">STEP 01</p>
+        <h2>Analyze your skin</h2>
+      </div>
 
-                  <div className="upload-format">
-                    JPG / PNG · Clear face photo recommended
-                  </div>
-                </label>
+      <div className="camera-icon">
+        <Camera size={20} />
+      </div>
+    </div>
 
-                <button
-                  className="analyze-button"
-                  onClick={analyzeSkin}
-                  disabled={!selectedFile || analyzing}
-                >
-                  <Sparkles size={18} />
-                  {analyzing
-                    ? "Analyzing..."
-                    : "Analyze My Skin"}
-                  <ChevronRight size={18} />
-                </button>
+    <label
+      className={`drop-zone ${
+        dragActive ? "drag-active" : ""
+      }`}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragActive(true);
+      }}
+      onDragLeave={() => setDragActive(false)}
+      onDrop={handleDrop}
+    >
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleInputChange}
+        hidden
+      />
 
-                <p className="privacy-note">
-                  <ShieldCheck size={14} />
-                  Your photo is processed securely.
-                </p>
+      <div className="upload-icon">
+        <Upload size={24} />
+      </div>
 
-                {analyzing && (
-                  <p
-                    style={{
-                      marginTop: "14px",
-                      textAlign: "center",
-                      fontWeight: "600",
-                    }}
-                  >
-                    🔍 Analyzing your skin...
-                  </p>
-                )}
+      {selectedFile ? (
+        <>
+          <h3>{selectedFile.name}</h3>
+          <p>Image selected successfully</p>
+        </>
+      ) : (
+        <>
+          <h3>Upload your photo</h3>
+          <p>
+            Drag & drop your photo here
+            <br />
+            or <span>browse from your device</span>
+          </p>
+        </>
+      )}
 
-                {error && (
-                  <p
-                    style={{
-                      marginTop: "14px",
-                      textAlign: "center",
-                      color: "#b42318",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {error}
-                  </p>
-                )}
-              </div>
-            </section>
+      <div className="upload-format">
+        JPG / PNG · Clear face photo recommended
+      </div>
+    </label>
+
+    <button
+      className="analyze-button"
+      onClick={analyzeSkin}
+      disabled={!selectedFile || analyzing}
+    >
+      <Sparkles size={18} />
+
+      {analyzing
+        ? "Analyzing..."
+        : "Analyze My Skin"}
+
+      <ChevronRight size={18} />
+    </button>
+
+    <p className="privacy-note">
+      <ShieldCheck size={14} />
+      Your photo is processed securely.
+    </p>
+
+    {analyzing && (
+      <p
+        style={{
+          marginTop: "14px",
+          textAlign: "center",
+          fontWeight: "600",
+        }}
+      >
+        🔍 Analyzing your skin...
+      </p>
+    )}
+
+    {error && (
+      <p
+        style={{
+          marginTop: "14px",
+          textAlign: "center",
+          color: "#b42318",
+          fontWeight: "600",
+        }}
+      >
+        {error}
+      </p>
+    )}
+  </div>
+</section>
+              
+                
+                  
+
+            
+                  
+                  
 
             <section id="how" className="feature-strip">
               <div className="feature">
