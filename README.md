@@ -201,33 +201,43 @@ SkinWise-AI-Backend/
 ├── requirements.txt
 └── ...
 
-⚙️ Local Frontend Setup
+
+Local Frontend Setup
 Clone the repository:
 git clone https://github.com/santoshml-lab/SkinWise-AI-Frontend.git
+
 Install dependencies:
 npm install
+
 Create a .env file:
 VITE_API_URL=YOUR_BACKEND_URL
+
 Start the development server:
 npm run dev
+
 ⚙️ Local Backend Setup
 Install dependencies:
 pip install -r requirements.txt
+
 Configure the required environment variables:
 YOUCAM_API_KEY=your_youcam_api_key
 YOUCAM_API_URL=https://yce-api-01.makeupar.com/s2s/v2.1/task/skin-analysis
 GROQ_API_KEY=your_groq_api_key
+
 Start the API:
 uvicorn main:app --reload
+
 📌 Important Notes
 A clear facial photo is recommended for analysis.
 YouCam analysis results are presented as provided by the analysis service.
 AI-generated guidance is intended for cosmetic skincare use.
 Product availability and pricing can change.
 SkinWise AI is not a medical diagnostic system.
+
 🏆 Hackathon Project
 SkinWise AI was developed as an AI-powered skincare experience combining computer vision, structured AI analysis, personalized guidance and cosmetic product exploration.
 The project demonstrates how AI analysis can be transformed into a more understandable and actionable user experience.
+
 👨‍💻 Built With
 Built with React, FastAPI, YouCam AI Skin Analysis and Groq-powered AI.
 SkinWise AI — Your skin. Understood.
