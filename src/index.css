@@ -2382,6 +2382,174 @@ a:focus-visible,
     margin-top: 20px;
   }
 }
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.final-cta {
+  position: relative;
+  max-width: 1180px;
+  margin: 20px auto 80px;
+  padding: 90px 30px;
+
+  overflow: hidden;
+  border-radius: 34px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eee3f3 0%,
+      #f8e9ed 48%,
+      #f9eee5 100%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.9);
+
+  box-shadow:
+    0 25px 70px rgba(83, 58, 110, 0.1);
+}
+
+.final-cta-glow {
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  top: -150px;
+  right: -80px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.5);
+  filter: blur(10px);
+}
+
+.final-cta-content {
+  position: relative;
+  z-index: 2;
+
+  max-width: 680px;
+  margin: 0 auto;
+
+  text-align: center;
+}
+
+.final-cta-content h2 {
+  margin: 12px 0 18px;
+
+  font-family: "Playfair Display", serif;
+  font-size: clamp(40px, 5vw, 62px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+
+  color: #29212f;
+}
+
+.final-cta-content h2 span {
+  color: #9a769c;
+}
+
+.final-cta-content > p:not(.mini-label) {
+  max-width: 520px;
+  margin: 0 auto;
+
+  color: #756c78;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.final-cta-button {
+  margin-top: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 14px 22px;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: #302936;
+  color: white;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 12px 30px rgba(48, 41, 54, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.final-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(48, 41, 54, 0.24);
+}
+
+.final-cta-note {
+  margin-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  color: #857889;
+  font-size: 11px;
+}
+
+/* =========================================================
+   FOOTER POLISH
+   ========================================================= */
+
+footer {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 0 45px;
+
+  border-top: 1px solid rgba(150, 125, 150, 0.12);
+}
+
+footer p {
+  color: #887b89;
+  font-size: 13px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .final-cta {
+    margin: 10px 20px 55px;
+    padding: 65px 22px;
+    border-radius: 28px;
+  }
+
+  .final-cta-content h2 {
+    font-size: 40px;
+  }
+
+  .final-cta-content > p:not(.mini-label) {
+    font-size: 14px;
+  }
+
+  .final-cta-button {
+    width: 100%;
+  }
+
+  footer {
+    margin: 0 20px;
+    padding-bottom: 35px;
+  }
+}
   
     
   
