@@ -1979,6 +1979,32 @@ a:focus-visible,
     min-height: 240px !important;
   }
 }
+
+@media (max-width: 600px) {
+  .upload-card {
+    display: block !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 30px 24px 24px !important;
+  }
+
+  .upload-card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 0 20px !important;
+  }
+
+  .upload-card-header h2 {
+    margin-top: 6px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .drop-zone {
+    min-height: 240px !important;
+    margin-top: 0 !important;
+  }
+}
   
     
   
