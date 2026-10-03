@@ -306,7 +306,7 @@ function App() {
     <div className="hero-visual">
       <div className="hero-image-card">
         <img
-          src="/hero-skin.jpg"
+          src="/hero-skin.png"
           alt="AI-powered skincare analysis"
         />
 
